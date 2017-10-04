@@ -4,16 +4,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
-
-import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +42,10 @@ public class InfoController {
     @Autowired
     OrderDetailService orderDetailService;
     
-    String uniqueID = UUID.randomUUID().toString();
+
+    
+    
+    //SetID setID=idService.getId();
     
     
     //++++++++++++++++++++++++++++Product Area++++++++++++++++++++++++++++++++++++++++++++++++
@@ -60,38 +55,100 @@ public class InfoController {
         Product product = infoService.findByCode(code);
         return product;
     }
-    @RequestMapping(value = "/createorder", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/info/{code}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void DeleteProduct(@PathVariable("code") String code) {
+        System.out.println("Deleting Product with id " + code);
+        infoService.delete(code);
+    }
+    @RequestMapping(value = "/info", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String CreateProduct(@RequestBody Product pro  ) throws JsonProcessingException {
+    	System.out.println("Creating Product " + pro.getName());
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode x = objectMapper.createObjectNode();
+        if (infoService.findByCode(pro.getCode())!=null) {
+            System.out.println("A Product with name " + pro.getCode() + " already exist");
+            
+            x.put("code",-1000);
+            x.put("message", "Product exists");
+            return objectMapper.writeValueAsString(x);
+        }
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        Date date = new Date();
+        pro.setCreateDate(dateFormat.format(date));
+        infoService.saveProduct(pro);
+ 
+        x.put("code",1000);
+        x.put("message", "OK");
+        return objectMapper.writeValueAsString(x);
+       }
+    @RequestMapping(value = "/updateproduct", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String UpdateProduct(@RequestBody Product pro) throws JsonProcessingException {
+    	ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode x = objectMapper.createObjectNode();
+        System.out.println("Updatting Product with id " + pro.getCode());
+        infoService.updateProduct(pro);
+        x.put("code",1000);
+        x.put("message","SC_OK");
+        return objectMapper.writeValueAsString(x);
+    }
+    
+    @RequestMapping(value = "/order", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
     public String createOrder(@RequestBody Order order) throws JsonProcessingException {
     	ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode x = objectMapper.createObjectNode();
-        uniqueID=UUID.randomUUID().toString();
-        System.out.println("Creating order infomation with id " + uniqueID);
-        order.setId(uniqueID);
+        System.out.println("Creating order infomation with id " +order.getOrderDetail().get(0).getCode());
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
         Date date = new Date();
         order.setOrderDate(dateFormat.format(date));
+        order.setOrderDetail(order.getOrderDetail());
+        order.setStatus("new order");
         orderService.saveOrder(order);
+        
+        for(OrderDetail product:order.getOrderDetail()){ 	
+            product.setOrder(order);
+        	orderDetailService.saveOrder(product);
+        	}
          x.put("code",1000);
          x.put("message", "OK");
          
         return objectMapper.writeValueAsString(x);
     }
-    @RequestMapping(value = "/createorderdetail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void createOrderDetail(@RequestBody OrderDetail orderde) {
-        System.out.println("Creating order detail infomation with id " + uniqueID);
-        orderde.setId(uniqueID);
+    @RequestMapping(value = "/status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public String updateStatus(@RequestBody Order order) throws JsonProcessingException {
+    	ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode x = objectMapper.createObjectNode();
+        System.out.println("Updating order infomation with id " +order.getOrderId());
         
-        orderDetailService.saveOrder(orderde);
+        orderService.updateStatus(order.getOrderId(), order.getStatus());
+         x.put("code",1000);
+         x.put("message", "OK");
+         
+        return objectMapper.writeValueAsString(x);
     }
+    
+    
     @ResponseBody
 	@RequestMapping(value = "/orders", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Order> listOrder() {
+    	
         List<Order> order = orderService.getAllOrder();
+        
+        
         return order;
     }
     @ResponseBody
-   	@RequestMapping(value = "/orderdetail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-       public List<OrderDetail> OrderDetail(String id) {
+    @RequestMapping(value = "/orders/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Order  getSingleOrder(@PathVariable("id") int id) {
+        Order order=orderService.findById(id);
+        return order;
+    }
+    
+    @ResponseBody
+   	@RequestMapping(value = "/orderdetail/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+       public List<OrderDetail> OrderDetail(int id) {
            List<OrderDetail> orderDetail = orderDetailService.getOrderDetail(id);
            return orderDetail;
        }
@@ -104,11 +161,6 @@ public class InfoController {
     public List<Product> listInfo() {
         List<Product> info = infoService.listInfo();
         return info;
-    }
-	
-	@RequestMapping(value = "/deleteproduct", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void deleteProduct(@RequestBody Product product) {
-		infoService.delete(product);
     }
 	
 	@ResponseBody
@@ -195,24 +247,24 @@ public class InfoController {
         Account acc = accountService.findById(accId);
         return acc;
     }
+    @RequestMapping(value = "/account/{accId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void  DeleteAccount(@PathVariable("accId") int accId) {
+        accountService.deleteAccount(accId);
+    }
     
     @RequestMapping(value = "/updateaccount", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String Update(@RequestBody Account acc  ) throws JsonProcessingException {
-    	System.out.println("Updating Account " + acc.getEmail());
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode x = objectMapper.createObjectNode();
-        int id=accountService.isAccountExist(acc.getEmail());
-        System.out.println("Updating Account " + id);
-        acc.setAccId(id);
+        //int id=accountService.isAccountExist(acc.getEmail());
+        System.out.println("Updating Account " + acc.getAccId());
+        //acc.setAccId(acc.getAccId());
         accountService.updateAccount(acc);;
         x.put("code",1000);
         x.put("message","SC_OK");
         return objectMapper.writeValueAsString(x);
     }
-    @RequestMapping(value = "/deleteaccount/{accId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void  DeleteAccount(@PathVariable("accId") int accId) {
-        accountService.deleteAccount(accId);
-    }
+    
  
 }

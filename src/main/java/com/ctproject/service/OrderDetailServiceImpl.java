@@ -25,7 +25,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 		orderdetailDAO.deleteOrder(orderde);
 	}
 	
-	public List<OrderDetail> getOrderDetail(String id){
+	public List<OrderDetail> getOrderDetail(int id){
 		return orderdetailDAO.getOrderDetail(id);
 	}
 

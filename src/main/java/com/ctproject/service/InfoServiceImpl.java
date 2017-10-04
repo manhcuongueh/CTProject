@@ -20,13 +20,18 @@ public class InfoServiceImpl implements InfoService {
 		return this.infoDAO.findByCode(code);
 	}
 
-	
+	public void saveProduct(Product pro){
+		infoDAO.saveProduct(pro);
+	}
+	public void updateProduct(Product pro){
+		infoDAO.updateProduct(pro);
+	}
 	public List<Product> listInfo() {
 		return this.infoDAO.listInfo();
 	}
 
-	public void delete(Product product){
-		infoDAO.delete(product);
+	public void delete(String code){
+		infoDAO.delete(code);
 	}
 	
 	public List<Product> searchInfo(String str) {

@@ -5,9 +5,12 @@ import java.util.List;
 import com.ctproject.dao.OrderDAO;
 import com.ctproject.model.Order;
 
+
 public interface OrderService {
 	
-	Order findById(String id);
+	Order findById(int id);
+	
+	void updateStatus(int id, String status);
 	
 	void saveOrder(Order order);
 	

@@ -1,6 +1,5 @@
 package com.ctproject.model;
 
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,15 +8,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "Product")
 public class Product{
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private String code;
 	
 	@Column(name = "NAME", nullable = false)
@@ -32,17 +28,15 @@ public class Product{
     private String scr;
 
     // For sort.
-	@Size(min=3, max=50)
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "Create_Date", nullable = false)
-    private Date createDate;
+    private String createDate;
 	
 	@Size(min=3, max=50)
-	@Column(name = "INFO", nullable = false)
+	@Column(name = "INFO")
     private String info;
 	
 	@Size(min=3, max=50)
-	@Column(name = "CATEGORY", nullable = false)
+	@Column(name = "CATEGORY")
     private String category;
 
     public Product() {
@@ -75,12 +69,12 @@ public class Product{
     }
 
     
-    public Date getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setCreateDate(String date) {
+        this.createDate = date;
     }
 
     public String getScr() {

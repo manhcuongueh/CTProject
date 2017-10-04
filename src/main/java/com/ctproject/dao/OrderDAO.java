@@ -7,7 +7,11 @@ import com.ctproject.model.Order;
 
 public interface OrderDAO {
 	
-	Order findById(String id);
+	void getId();
+	
+	void updateStatus(int id, String status);
+	
+	Order findById(int id);
 	
 	void saveOrder(Order order);
 	

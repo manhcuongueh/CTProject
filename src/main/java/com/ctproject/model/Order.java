@@ -1,28 +1,33 @@
 package com.ctproject.model;
 
-
-import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "Orders")
+@JsonIgnoreProperties
 public class Order {
     
     @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
-
+    @Column(name = "ORDERID", length = 50)
+    private int orderId;
+    
+    
 	@Column(name = "ORDER_DATE")
     private String order_Date;
 	
-	@Column(name = "ORDERNUMBER")
-    private int orderNumber;
 
 	@Column(name = "AMOUNT", nullable = false)
     private double amount;
@@ -30,26 +35,21 @@ public class Order {
 	@Column(name = "ACCID", nullable = false)
     private double accId;
 	
-     
+	@Column(name = "STATUS", nullable = false)
+    private String status;
 	
-    @Id
-    @Column(name = "ID", length = 50)
-    public String getId() {
-        return id;
+	
+	@OneToMany(fetch =FetchType.EAGER,mappedBy="order")
+	private List<OrderDetail> orderDetail;
+	
+    
+    public int getOrderId() {
+        return orderId;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
- 
-
-
-	public int getOrderNumber() {
-		return orderNumber;
-	}
-
-	public void setOrderNumber(int orderNumber) {
-		this.orderNumber = orderNumber;
+    public void setOrderId(int id) {
+        this.orderId = id;
+   
 	}
 
 	public double getAccId() {
@@ -60,7 +60,6 @@ public class Order {
 		this.accId = accId;
 	}
 
-	@Column(name = "Order_Date", nullable = false)
     public String getOrderDate() {
         return order_Date;
     }
@@ -69,7 +68,7 @@ public class Order {
         this.order_Date = string;
     }
 
-    @Column(name = "Amount", nullable = false)
+
     public double getAmount() {
         return amount;
     }
@@ -77,6 +76,24 @@ public class Order {
     public void setAmount(double amount) {
         this.amount = amount;
     }
+
+	public List<OrderDetail> getOrderDetail() {
+		return orderDetail;
+	}
+	
+	
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public void setOrderDetail(List<OrderDetail> orderDetail) {
+		this.orderDetail = orderDetail;
+	}
 
     }
    

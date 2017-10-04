@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ctproject.model.OrderDetail;
 
+
 @Repository("orderDetailDAO")
 public class OrderDetailDAOImpl extends AbstractDao<Integer, OrderDetail> implements OrderDetailDAO{
 	
@@ -18,8 +19,8 @@ public class OrderDetailDAOImpl extends AbstractDao<Integer, OrderDetail> implem
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<OrderDetail> getOrderDetail(String id){
-		List<OrderDetail> Orderdetail = getSession().createQuery("FROM Order_details WHERE id LIKE '"+id+"'").list();
+	public List<OrderDetail> getOrderDetail(int id){
+		List<OrderDetail> Orderdetail = getSession().createQuery("FROM Orderdetail WHERE id LIKE '"+id+"'").list();
 		return Orderdetail;
 	}
 

@@ -6,17 +6,23 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
-@Table(name = "Order_Details")
+@Table(name = "OrderDetail")
 public class OrderDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int oderId;
-
-	@Column(name = "ID", nullable = false)
-    private String id;
+	private int orderDetailId;
+	
+	@JsonIgnore 
+	@ManyToOne
+	@JoinColumn(name = "ORDERID", nullable = false)
+	private Order order;
 	
 	@Column(name = "QUANTITY", nullable = false)
     private int quantity;
@@ -34,12 +40,12 @@ public class OrderDetail {
     private String  code;
 
 	
-	public int getOderId() {
-		return oderId;
+	public int getOderDetailId() {
+		return orderDetailId;
 	}
 
-	public void setOderId(int oderId) {
-		this.oderId = oderId;
+	public void setOderId(int oderDetailId) {
+		this.orderDetailId = oderDetailId;
 	}
 
 	public String getName() {
@@ -74,14 +80,6 @@ public class OrderDetail {
 		this.price = price;
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	public String getCode() {
 		return code;
 	}
@@ -89,6 +87,15 @@ public class OrderDetail {
 	public void setCode(String code) {
 		this.code = code;
 	}
+
+	public Order getOrder() {
+		return order;
+	}
+
+	public void setOrder(Order order) {
+		this.order = order;
+	}
+	
 	
 	
 }
